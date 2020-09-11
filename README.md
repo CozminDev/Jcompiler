@@ -1,3 +1,3 @@
-# C# Compiler
+# JCompiler
 
-This is my take at building a C# compiler.
+This is a compiler for a javascript like language built in C#.
