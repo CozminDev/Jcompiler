@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Jcompiler.Tokenizer
+namespace Jcompiler.Syntax
 {
     public class Lexer
     {
@@ -28,7 +28,7 @@ namespace Jcompiler.Tokenizer
         public Token NextToken()
         {
             if (position >= text.Length)
-                return new Token(TokenKind.EndOfFileToken, position, "\0", null);
+                return new Token(NodeKind.EndOfFileToken, position, "\0", null);
 
             if (char.IsDigit(Current))
             {
@@ -43,7 +43,7 @@ namespace Jcompiler.Tokenizer
                 if (!int.TryParse(txt, out int value))
                     diagnostics.Add($"The number {txt} isn't valid Int32.");
 
-                return new Token(TokenKind.NumberToken, start, txt, value);
+                return new Token(NodeKind.NumberToken, start, txt, value);
             }
 
 
@@ -56,24 +56,24 @@ namespace Jcompiler.Tokenizer
 
                 var length = position - start;
                 var txt = text.Substring(start, length);
-                return new Token(TokenKind.WhitespaceToken, start, txt, null);
+                return new Token(NodeKind.WhitespaceToken, start, txt, null);
             }
 
             if (Current == '+')
-                return new Token(TokenKind.PlusToken, position++, "+", null);
+                return new Token(NodeKind.PlusToken, position++, "+", null);
             else if (Current == '-')
-                return new Token(TokenKind.MinusToken, position++, "-", null);
+                return new Token(NodeKind.MinusToken, position++, "-", null);
             else if (Current == '*')
-                return new Token(TokenKind.StarToken, position++, "*", null);
+                return new Token(NodeKind.StarToken, position++, "*", null);
             else if (Current == '/')
-                return new Token(TokenKind.SlashToken, position++, "/", null);
+                return new Token(NodeKind.SlashToken, position++, "/", null);
             else if (Current == '(')
-                return new Token(TokenKind.OpenParenthesisToken, position++, "(", null);
+                return new Token(NodeKind.OpenParenthesisToken, position++, "(", null);
             else if (Current == ')')
-                return new Token(TokenKind.CloseParenthesisToken, position++, ")", null);
+                return new Token(NodeKind.CloseParenthesisToken, position++, ")", null);
 
             diagnostics.Add($"ERROR: bad character input: '{Current}'");
-            return new Token(TokenKind.BadToken, position++, text.Substring(position - 1, 1), null);
+            return new Token(NodeKind.BadToken, position++, text.Substring(position - 1, 1), null);
         }
 
         private void Next()
