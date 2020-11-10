@@ -1,5 +1,7 @@
-﻿using Jcompiler.Syntax;
+﻿using Jcompiler.Binding;
+using Jcompiler.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Jcompiler
@@ -8,10 +10,32 @@ namespace Jcompiler
     {
         static void Main(string[] args)
         {
-            Console.Write("> ");
-            string text = Console.ReadLine();
-            ExpressionTree expressionTree = ExpressionTree.Parse(text);
-            PrettyPrint(expressionTree.Root);
+            while (true)
+            {
+                Console.Write("> ");
+                string text = Console.ReadLine();
+                ExpressionTree expressionTree = ExpressionTree.Parse(text);
+                Binder binder = new Binder();
+                BoundExpression expr = binder.BindExpression(expressionTree.Root);
+                IEnumerable<string> diagnostics = expressionTree.Diagnostics.Concat(binder.Diagnostics);
+                if (!diagnostics.Any())
+                {
+                    Evaluator evaluator = new Evaluator(expr);
+                    Console.WriteLine(evaluator.Evaluate());
+                    Console.WriteLine();
+                    PrettyPrint(expressionTree.Root);
+
+                }
+                else
+                {
+                    foreach (string error in diagnostics)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine(error);
+                        Console.ResetColor();
+                    }
+                }
+            }
         }
 
         static void PrettyPrint(Node node, string indent = "", bool isLast = true)

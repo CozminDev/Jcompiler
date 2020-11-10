@@ -7,12 +7,12 @@ namespace Jcompiler.Syntax
     {
         public ExpressionTree(IEnumerable<string> diagnostics, Expression root, Token endOfFileToken)
         {
-            Diagnostics = diagnostics.ToArray();
+            Diagnostics = diagnostics;
             Root = root;
             EndOfFileToken = endOfFileToken;
         }
 
-        public IReadOnlyList<string> Diagnostics { get; }
+        public IEnumerable<string> Diagnostics { get; }
         public Expression Root { get; }
         public Token EndOfFileToken { get; }
 
