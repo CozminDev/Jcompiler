@@ -8,7 +8,7 @@ namespace Jcompiler.Binding
     {
         private List<string> diagnostics;
 
-        public IEnumerable<string> Diagnostics => diagnostics;
+        public List<string> Diagnostics => diagnostics;
 
         public Binder()
         {

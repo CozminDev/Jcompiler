@@ -1,5 +1,4 @@
-﻿using Jcompiler.Binding;
-using Jcompiler.Syntax;
+﻿using Jcompiler.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,26 +14,34 @@ namespace Jcompiler
                 Console.Write("> ");
                 string text = Console.ReadLine();
                 ExpressionTree expressionTree = ExpressionTree.Parse(text);
-                Binder binder = new Binder();
-                BoundExpression expr = binder.BindExpression(expressionTree.Root);
-                IEnumerable<string> diagnostics = expressionTree.Diagnostics.Concat(binder.Diagnostics);
-                if (!diagnostics.Any())
-                {
-                    Evaluator evaluator = new Evaluator(expr);
-                    Console.WriteLine(evaluator.Evaluate());
-                    Console.WriteLine();
-                    PrettyPrint(expressionTree.Root);
 
-                }
-                else
+                if (expressionTree.Diagnostics.Any())
                 {
-                    foreach (string error in diagnostics)
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine(error);
-                        Console.ResetColor();
-                    }
+                    PrintDiagnostics(expressionTree.Diagnostics);
+                    continue;
                 }
+
+                Compilation compilation = new Compilation(expressionTree);
+                EvaluationResult result = compilation.Evaluate();
+
+                if (result.Diagnostics.Any())
+                {
+                    PrintDiagnostics(result.Diagnostics);
+                    continue;
+                }
+
+                Console.WriteLine(result.Result);
+                PrettyPrint(expressionTree.Root);
+            }
+        }
+
+        static void PrintDiagnostics(List<string> diagnostics)
+        {
+            foreach (string error in diagnostics)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine(error);
+                Console.ResetColor();
             }
         }
 

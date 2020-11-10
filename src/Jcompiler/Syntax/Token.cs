@@ -19,6 +19,8 @@ namespace Jcompiler.Syntax
         public string Text { get; }
         public object Value { get; set; }
 
+        public TextSpan Span => new TextSpan(Position, Text.Length);
+
         public override IEnumerable<Node> GetChildren()
         {
             return Enumerable.Empty<Node>();

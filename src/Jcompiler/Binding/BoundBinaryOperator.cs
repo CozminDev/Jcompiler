@@ -17,12 +17,12 @@ namespace Jcompiler.Binding
 
         }
 
-        private BoundBinaryOperator(NodeKind nodeKind, BoundBinaryOperatorKind kind, Type leftType, Type rightTye, Type resultType)
+        private BoundBinaryOperator(NodeKind nodeKind, BoundBinaryOperatorKind kind, Type leftType, Type rightType, Type resultType)
         {
             NodeKind = nodeKind;
             Kind = kind;
             LeftType = leftType;
-            RightTye = rightTye;
+            RightTye = rightType;
             Type = resultType;
         }
 
