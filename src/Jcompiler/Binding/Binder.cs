@@ -1,20 +1,18 @@
 ﻿using Jcompiler.Syntax;
 using System;
-using System.Collections.Generic;
 
 namespace Jcompiler.Binding
 {
     public class Binder
     {
-        private List<string> diagnostics;
+        private DiagnosticBag diagnostics;
 
-        public List<string> Diagnostics => diagnostics;
+        public DiagnosticBag Diagnostics => diagnostics;
 
         public Binder()
         {
-            this.diagnostics = new List<string>();
+            diagnostics = new DiagnosticBag();
         }
-
 
         public BoundExpression BindExpression(Expression expression)
         {
@@ -47,7 +45,7 @@ namespace Jcompiler.Binding
 
             if (boundOperator == null)
             {
-                diagnostics.Add($"Unary operator '{expression.OperatorToken.Text}' is not defined for type {boundOperand.Type}.");
+                diagnostics.ReportUndefinedUnaryOperator(expression.OperatorToken.Span, expression.OperatorToken.Text, boundOperand.Type);
                 return boundOperand;
             }
 
@@ -67,7 +65,7 @@ namespace Jcompiler.Binding
 
             if (boundOperator == null)
             {
-                diagnostics.Add($"Binary operator '{expression.OperatorToken.Text}' is not defined for types {boundLeft.Type} and {boundRight.Type}.");
+                diagnostics.ReportUndefinedBinaryOperator(expression.OperatorToken.Span, expression.OperatorToken.Text, boundLeft.Type, boundRight.Type);
                 return boundLeft;
             }
 

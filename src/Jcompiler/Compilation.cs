@@ -1,6 +1,5 @@
 ﻿using Jcompiler.Binding;
 using Jcompiler.Syntax;
-using System.Linq;
 
 namespace Jcompiler
 {
@@ -20,9 +19,6 @@ namespace Jcompiler
             BoundExpression boundExpression = binder.BindExpression(expressionTree.Root);
 
             Evaluator evaluator = new Evaluator(boundExpression);
-
-            if (binder.Diagnostics.Any())
-                return new EvaluationResult(binder.Diagnostics, null);
 
             object result = evaluator.Evaluate();
 

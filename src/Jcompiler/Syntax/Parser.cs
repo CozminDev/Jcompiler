@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Jcompiler.Syntax
 {
     public class Parser
     {
-        private List<string> diagnostics;
+        private DiagnosticBag diagnostics;
         private int position;
         private List<Token> tokens;
         private Token Current
@@ -20,10 +21,10 @@ namespace Jcompiler.Syntax
 
         public Parser(string text)
         {
-            diagnostics = new List<string>();
+            diagnostics = new DiagnosticBag();
             tokens = new List<Token>();
 
-            Lexer lexer = new Lexer(text);
+            Lexer lexer = new Lexer(text, diagnostics);
             Token token;
             do
             {
@@ -46,12 +47,15 @@ namespace Jcompiler.Syntax
             if (Current.Kind == kind)
                 return GetTokenAndMoveNext();
 
-            diagnostics.Add($"ERROR: Unexpected token <{Current.Kind}>, expected <{kind}>");
+            diagnostics.ReportUnexpectedToken(Current.Span, Current.Kind, kind);
             return new Token(kind, Current.Position, null, null);
         }
 
         public ExpressionTree Parse()
         {
+            if (diagnostics.Any())
+                return new ExpressionTree(diagnostics, null, null);
+
             Expression expression = ParseExpression();
             Token endOfFileToken = MatchToken(NodeKind.EndOfFileToken);
             return new ExpressionTree(diagnostics, expression, endOfFileToken);

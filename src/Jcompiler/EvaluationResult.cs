@@ -4,13 +4,13 @@ namespace Jcompiler
 {
     public class EvaluationResult
     {
-        public EvaluationResult(List<string> diagnostics, object result)
+        public EvaluationResult(DiagnosticBag diagnostics, object result)
         {
             Diagnostics = diagnostics;
             Result = result;
         }
 
-        public List<string> Diagnostics { get; }
+        public DiagnosticBag Diagnostics { get; }
         public object Result { get; }
     }
 }

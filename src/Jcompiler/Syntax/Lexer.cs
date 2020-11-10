@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace Jcompiler.Syntax
+﻿namespace Jcompiler.Syntax
 {
     public class Lexer
     {
         private readonly string text;
+        private DiagnosticBag diagnostics;
         private int position;
-        private List<string> diagnostics;
 
         public char Current
         {
@@ -30,10 +28,10 @@ namespace Jcompiler.Syntax
             }
         }
 
-        public Lexer(string text)
+        public Lexer(string text, DiagnosticBag diagnostics)
         {
             this.text = text;
-            diagnostics = new List<string>();
+            this.diagnostics = diagnostics;
         }
 
         public Token NextToken()
@@ -52,7 +50,7 @@ namespace Jcompiler.Syntax
                 int length = position - start;
                 string txt = text.Substring(start, length);
                 if (!int.TryParse(txt, out int value))
-                    diagnostics.Add($"The number {txt} isn't valid Int32.");
+                    diagnostics.ReportInvalidNumber(new TextSpan(start,length), txt, typeof(int));
 
                 return new Token(NodeKind.NumberToken, start, txt, value);
             }
@@ -90,7 +88,7 @@ namespace Jcompiler.Syntax
                 }
                 else
                 {
-                    diagnostics.Add($"The keyword {txt} isn't valid Keyword.");
+                    return new Token(NodeKind.IdentifierToken, start, txt, null);
                 }
 
             }
@@ -110,7 +108,27 @@ namespace Jcompiler.Syntax
                 case ')':
                     return new Token(NodeKind.CloseParenthesisToken, position++, ")", null);
                 case '!':
-                    return new Token(NodeKind.BangToken, position++, "!", null);
+                    {
+                        if (Lookahead == '=')
+                        {
+                            int start = position;
+                            position += 2;
+                            return new Token(NodeKind.BangEqualsToken, start, "!=", null);
+                        }                           
+                        else
+                            return new Token(NodeKind.BangToken, position++, "!", null);
+                    }                  
+                case '=':
+                    {
+                        if (Lookahead == '=')
+                        {
+                            int start = position;
+                            position += 2;
+                            return new Token(NodeKind.EqualsEqualsToken, start, "==", null);
+                        }                          
+                        else
+                            return new Token(NodeKind.EqualsToken, position++, "=", null);
+                    }
                 case '|':
                     {
                        if(Lookahead == '|')
@@ -121,7 +139,6 @@ namespace Jcompiler.Syntax
                         }                           
                         break;
                     }
-
                 case '&':
                     {                       
                         if (Lookahead == '&')
@@ -135,7 +152,7 @@ namespace Jcompiler.Syntax
             }
 
 
-            diagnostics.Add($"ERROR: bad character input: '{Current}'");
+            diagnostics.ReportBadCharacter(position, Current);
             return new Token(NodeKind.BadToken, position++, text.Substring(position - 1, 1), null);
         }
 

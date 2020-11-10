@@ -5,14 +5,14 @@ namespace Jcompiler.Syntax
 {
     public class ExpressionTree
     {
-        public ExpressionTree(List<string> diagnostics, Expression root, Token endOfFileToken)
+        public ExpressionTree(DiagnosticBag diagnostics, Expression root, Token endOfFileToken)
         {
             Diagnostics = diagnostics;
             Root = root;
             EndOfFileToken = endOfFileToken;
         }
 
-        public List<string> Diagnostics { get; }
+        public DiagnosticBag Diagnostics { get; }
         public Expression Root { get; }
         public Token EndOfFileToken { get; }
 

@@ -17,7 +17,7 @@ namespace Jcompiler
 
                 if (expressionTree.Diagnostics.Any())
                 {
-                    PrintDiagnostics(expressionTree.Diagnostics);
+                    PrintDiagnostics(expressionTree.Diagnostics, text);
                     continue;
                 }
 
@@ -26,7 +26,7 @@ namespace Jcompiler
 
                 if (result.Diagnostics.Any())
                 {
-                    PrintDiagnostics(result.Diagnostics);
+                    PrintDiagnostics(result.Diagnostics, text);
                     continue;
                 }
 
@@ -35,11 +35,24 @@ namespace Jcompiler
             }
         }
 
-        static void PrintDiagnostics(List<string> diagnostics)
+        static void PrintDiagnostics(DiagnosticBag diagnostics, string text)
         {
-            foreach (string error in diagnostics)
+            foreach (Diagnostic error in diagnostics)
             {
+                string prefix = text.Substring(0, error.Span.Position);
+                string span = text.Substring(error.Span.Position, error.Span.Length);
+                string suffix = text.Substring(error.Span.Position + error.Span.Length);
+
+                Console.WriteLine();
+                Console.Write("     ");
+                Console.Write(prefix);
                 Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write(span);
+                Console.ResetColor();
+                Console.Write(suffix);
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine();
+                Console.WriteLine();
                 Console.WriteLine(error);
                 Console.ResetColor();
             }
