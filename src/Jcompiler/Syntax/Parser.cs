@@ -78,9 +78,9 @@ namespace Jcompiler.Syntax
                 if (precedence == 0 || precedence <= parentPrecedence)
                     break;
 
-                Node operatorNode = GetTokenAndMoveNext();
+                Token operatorToken = GetTokenAndMoveNext();
                 Expression right = ParseExpression(precedence);
-                left = new BinaryExpression(left, operatorNode, right);
+                left = new BinaryExpression(left, operatorToken, right);
             }
 
             return left;
