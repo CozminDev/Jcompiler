@@ -6,6 +6,8 @@
         BoundBinaryExpression,
         BoundUnaryExpression,
         UnaryExpression,
-        ParenthesizedExpression
+        ParenthesizedExpression,
+        BoundAssignmentExpression,
+        BoundIdentifierExpression
     }
 }

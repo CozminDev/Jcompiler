@@ -29,5 +29,7 @@
         BinaryExpression,
         ParenthesizedExpression,
         EqualsToken,
+        IdentifierExpression,
+        AssignmentExpression,
     }
 }

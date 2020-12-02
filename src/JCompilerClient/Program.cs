@@ -9,6 +9,8 @@ namespace Jcompiler
     {
         static void Main(string[] args)
         {
+            Dictionary<string, object> symbolTable = new Dictionary<string, object>();
+
             while (true)
             {
                 Console.Write("> ");
@@ -21,7 +23,7 @@ namespace Jcompiler
                     continue;
                 }
 
-                Compilation compilation = new Compilation(expressionTree);
+                Compilation compilation = new Compilation(expressionTree, symbolTable);
                 EvaluationResult result = compilation.Evaluate();
 
                 if (result.Diagnostics.Any())
