@@ -90,7 +90,6 @@
                 {
                     return new Token(NodeKind.IdentifierToken, start, txt, null);
                 }
-
             }
 
             switch (Current)

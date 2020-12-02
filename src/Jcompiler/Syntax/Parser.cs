@@ -76,6 +76,17 @@ namespace Jcompiler.Syntax
                 left = ParsePrimaryExpression();
             }
 
+            if(left.Kind == NodeKind.IdentifierExpression)
+            {
+                if(Current.Kind == NodeKind.EqualsToken)
+                {
+                    Token operatorToken = GetTokenAndMoveNext();
+                    var right = ParseExpression();
+                    left = new AssignmentExpression((IdentifierExpression)left, operatorToken, right);
+                    return left;
+                }
+            }
+
             while (true)
             {
                 int precedence = Current.Kind.GetBinaryOperatorPrecedence();
@@ -109,7 +120,11 @@ namespace Jcompiler.Syntax
                         var value = keywordToken.Kind == NodeKind.TrueKeyword;
                         return new LiteralExpression(keywordToken, value);
                     }
-
+                case NodeKind.IdentifierToken:
+                    {
+                        var identifierToken = GetTokenAndMoveNext();
+                        return new IdentifierExpression(identifierToken);
+                    }
                 default:
                     {
                         var numberToken = MatchToken(NodeKind.NumberToken);
