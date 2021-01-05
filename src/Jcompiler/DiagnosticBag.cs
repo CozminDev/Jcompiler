@@ -59,5 +59,12 @@ namespace Jcompiler
             var message = $"Binary operator '{operatorText}' is not defined for types {leftType} and {rightType}.";
             Report(span, message);
         }
+
+        public void ReportNoInput()
+        {
+            var message = $"No Input ERR";
+            var span = new TextSpan(0, 0);
+            Report(span, message);
+        }
     }
 }
