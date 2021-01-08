@@ -108,5 +108,26 @@ namespace Jcompiler.Tests
             enumerator.AssertNode(NodeKind.LiteralExpression);
             enumerator.AssertToken(NodeKind.NumberToken, "5");
         }
+
+        [TestMethod]
+        public void Parse_AssignmentExpression_ReturnsCorrectTree()
+        {
+            string text = "a = 1";
+            Parser parser = new Parser(text);
+
+            ExpressionTree tree = parser.Parse();
+            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root);
+
+            //   =
+            //  / \
+            // a   1 
+
+            enumerator.AssertNode(NodeKind.AssignmentExpression);
+            enumerator.AssertNode(NodeKind.IdentifierExpression);
+            enumerator.AssertToken(NodeKind.IdentifierToken, "a");
+            enumerator.AssertToken(NodeKind.EqualsToken, TestingHelper.GetNodeKindText(NodeKind.EqualsToken));
+            enumerator.AssertNode(NodeKind.LiteralExpression);
+            enumerator.AssertToken(NodeKind.NumberToken, "1");
+        }
     }
 }
