@@ -9,7 +9,7 @@ namespace Jcompiler
         private readonly ExpressionTree expressionTree;
         private Dictionary<string, object> symbolTable;
 
-        public Compilation(ExpressionTree expressionTree, System.Collections.Generic.Dictionary<string, object> symbolTable)
+        public Compilation(ExpressionTree expressionTree, Dictionary<string, object> symbolTable)
         {
             this.expressionTree = expressionTree;
             this.symbolTable = symbolTable;

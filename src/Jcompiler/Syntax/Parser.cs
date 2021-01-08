@@ -32,6 +32,7 @@ namespace Jcompiler.Syntax
 
                 if (token.Kind != NodeKind.WhitespaceToken && token.Kind != NodeKind.BadToken)
                     tokens.Add(token);
+
             } while (token.Kind != NodeKind.EndOfFileToken);
         }
 
@@ -76,9 +77,9 @@ namespace Jcompiler.Syntax
                 left = ParsePrimaryExpression();
             }
 
-            if(left.Kind == NodeKind.IdentifierExpression)
+            if (left.Kind == NodeKind.IdentifierExpression)
             {
-                if(Current.Kind == NodeKind.EqualsToken)
+                if (Current.Kind == NodeKind.EqualsToken)
                 {
                     Token operatorToken = GetTokenAndMoveNext();
                     var right = ParseExpression();

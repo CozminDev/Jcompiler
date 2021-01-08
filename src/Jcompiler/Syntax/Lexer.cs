@@ -21,10 +21,10 @@
         {
             get
             {
-                if (position+1 > text.Length - 1)
+                if (position + 1 > text.Length - 1)
                     return '\0';
 
-                return text[position+1];
+                return text[position + 1];
             }
         }
 
@@ -36,6 +36,9 @@
 
         public Token NextToken()
         {
+            if (text.Length == 0)
+                diagnostics.ReportNoInput();
+
             if (position >= text.Length)
                 return new Token(NodeKind.EndOfFileToken, position, "\0", null);
 
@@ -50,7 +53,7 @@
                 int length = position - start;
                 string txt = text.Substring(start, length);
                 if (!int.TryParse(txt, out int value))
-                    diagnostics.ReportInvalidNumber(new TextSpan(start,length), txt, typeof(int));
+                    diagnostics.ReportInvalidNumber(new TextSpan(start, length), txt, typeof(int));
 
                 return new Token(NodeKind.NumberToken, start, txt, value);
             }
@@ -113,10 +116,10 @@
                             int start = position;
                             position += 2;
                             return new Token(NodeKind.BangEqualsToken, start, "!=", null);
-                        }                           
+                        }
                         else
                             return new Token(NodeKind.BangToken, position++, "!", null);
-                    }                  
+                    }
                 case '=':
                     {
                         if (Lookahead == '=')
@@ -124,28 +127,28 @@
                             int start = position;
                             position += 2;
                             return new Token(NodeKind.EqualsEqualsToken, start, "==", null);
-                        }                          
+                        }
                         else
                             return new Token(NodeKind.EqualsToken, position++, "=", null);
                     }
                 case '|':
                     {
-                       if(Lookahead == '|')
+                        if (Lookahead == '|')
                         {
                             int start = position;
                             position += 2;
                             return new Token(NodeKind.PipePipeToken, start, "||", null);
-                        }                           
+                        }
                         break;
                     }
                 case '&':
-                    {                       
+                    {
                         if (Lookahead == '&')
                         {
                             int start = position;
                             position += 2;
                             return new Token(NodeKind.AmpersandAmpersandToken, start, "&&", null);
-                        }                           
+                        }
                         break;
                     }
             }
