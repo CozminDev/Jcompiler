@@ -1,4 +1,4 @@
-﻿using Jcompiler.Syntax;
+﻿using Jcompiler.Text;
 
 namespace Jcompiler
 {

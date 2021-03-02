@@ -12,8 +12,6 @@ namespace Jcompiler.Binding
 
         public DiagnosticBag Diagnostics => diagnostics;
 
-
-
         public Binder(Dictionary<string, object> symbolTable)
         {
             diagnostics = new DiagnosticBag();

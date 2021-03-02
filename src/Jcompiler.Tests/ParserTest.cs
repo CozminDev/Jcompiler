@@ -10,10 +10,8 @@ namespace Jcompiler.Tests
         public void Parse_PlusExpression_ReturnsCorrectTree()
         {
             string text = "1+2";
-            Parser parser = new Parser(text);
-
-            ExpressionTree tree = parser.Parse();
-            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root);
+            ExpressionTree tree = ExpressionTree.Parse(text);
+            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root.Expression);
 
             //   +
             //  / \
@@ -31,10 +29,8 @@ namespace Jcompiler.Tests
         public void Parse_PlusAndTimesExpression_HonorsPrecedence_ReturnsCorrectTree()
         {
             string text = "1+2*5";
-            Parser parser = new Parser(text);
-
-            ExpressionTree tree = parser.Parse();
-            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root);
+            ExpressionTree tree = ExpressionTree.Parse(text);
+            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root.Expression);
 
             //   +
             //  / \
@@ -58,10 +54,8 @@ namespace Jcompiler.Tests
         public void Parse_ParenthesizedExpression_ReturnsCorrectTree()
         {
             string text = "(1+2)*5";
-            Parser parser = new Parser(text);
-
-            ExpressionTree tree = parser.Parse();
-            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root);
+            ExpressionTree tree = ExpressionTree.Parse(text);
+            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root.Expression);
 
             //      *
             //     / \
@@ -88,10 +82,8 @@ namespace Jcompiler.Tests
         public void Parse_UnaryExpression_ReturnsCorrectTree()
         {
             string text = "-2+5";
-            Parser parser = new Parser(text);
-
-            ExpressionTree tree = parser.Parse();
-            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root);
+            ExpressionTree tree = ExpressionTree.Parse(text);
+            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root.Expression);
 
             //      *
             //     / \
@@ -113,10 +105,8 @@ namespace Jcompiler.Tests
         public void Parse_AssignmentExpression_ReturnsCorrectTree()
         {
             string text = "a = 1";
-            Parser parser = new Parser(text);
-
-            ExpressionTree tree = parser.Parse();
-            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root);
+            ExpressionTree tree = ExpressionTree.Parse(text);
+            AssertingEnumerator enumerator = new AssertingEnumerator(tree.Root.Expression);
 
             //   =
             //  / \

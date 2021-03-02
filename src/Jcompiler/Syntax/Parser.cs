@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using Jcompiler.Text;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Jcompiler.Syntax
 {
     public class Parser
     {
-        private DiagnosticBag diagnostics;
         private int position;
         private List<Token> tokens;
+        private SourceText text;
+        private DiagnosticBag diagnostics;
+
         private Token Current
         {
             get
@@ -19,10 +22,13 @@ namespace Jcompiler.Syntax
             }
         }
 
-        public Parser(string text)
+        public DiagnosticBag Diagnostics => diagnostics;
+
+        public Parser(SourceText text)
         {
-            diagnostics = new DiagnosticBag();
-            tokens = new List<Token>();
+            this.diagnostics = new DiagnosticBag();
+            this.tokens = new List<Token>();
+            this.text = text;
 
             Lexer lexer = new Lexer(text, diagnostics);
             Token token;
@@ -52,14 +58,11 @@ namespace Jcompiler.Syntax
             return new Token(kind, Current.Position, null, null);
         }
 
-        public ExpressionTree Parse()
+        public CompilationUnit ParseCompilationUnit()
         {
-            if (diagnostics.Any())
-                return new ExpressionTree(diagnostics, null, null);
-
             Expression expression = ParseExpression();
             Token endOfFileToken = MatchToken(NodeKind.EndOfFileToken);
-            return new ExpressionTree(diagnostics, expression, endOfFileToken);
+            return new CompilationUnit(expression, endOfFileToken);
         }
 
         private Expression ParseExpression(int parentPrecedence = 0)
@@ -108,27 +111,27 @@ namespace Jcompiler.Syntax
             {
                 case NodeKind.OpenParenthesisToken:
                     {
-                        var left = GetTokenAndMoveNext();
-                        var expression = ParseExpression();
-                        var right = MatchToken(NodeKind.CloseParenthesisToken);
+                        Token left = GetTokenAndMoveNext();
+                        Expression expression = ParseExpression();
+                        Token right = MatchToken(NodeKind.CloseParenthesisToken);
                         return new ParenthesizedExpression(left, expression, right);
                     }
 
                 case NodeKind.FalseKeyword:
                 case NodeKind.TrueKeyword:
                     {
-                        var keywordToken = GetTokenAndMoveNext();
-                        var value = keywordToken.Kind == NodeKind.TrueKeyword;
+                        Token keywordToken = GetTokenAndMoveNext();
+                        bool value = keywordToken.Kind == NodeKind.TrueKeyword;
                         return new LiteralExpression(keywordToken, value);
                     }
                 case NodeKind.IdentifierToken:
                     {
-                        var identifierToken = GetTokenAndMoveNext();
+                        Token identifierToken = GetTokenAndMoveNext();
                         return new IdentifierExpression(identifierToken);
                     }
                 default:
                     {
-                        var numberToken = MatchToken(NodeKind.NumberToken);
+                        Token numberToken = MatchToken(NodeKind.NumberToken);
                         return new LiteralExpression(numberToken);
                     }
             }

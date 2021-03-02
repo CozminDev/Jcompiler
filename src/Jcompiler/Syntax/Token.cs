@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Jcompiler.Text;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Jcompiler.Syntax

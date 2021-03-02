@@ -1,8 +1,10 @@
-﻿namespace Jcompiler.Syntax
+﻿using Jcompiler.Text;
+
+namespace Jcompiler.Syntax
 {
     public class Lexer
     {
-        private readonly string text;
+        private readonly SourceText text;
         private DiagnosticBag diagnostics;
         private int position;
 
@@ -28,7 +30,7 @@
             }
         }
 
-        public Lexer(string text, DiagnosticBag diagnostics)
+        public Lexer(SourceText text, DiagnosticBag diagnostics)
         {
             this.text = text;
             this.diagnostics = diagnostics;
@@ -51,7 +53,7 @@
                 }
 
                 int length = position - start;
-                string txt = text.Substring(start, length);
+                string txt = text.ToString(start, length);
                 if (!int.TryParse(txt, out int value))
                     diagnostics.ReportInvalidNumber(new TextSpan(start, length), txt, typeof(int));
 
@@ -67,7 +69,7 @@
                     Next();
 
                 var length = position - start;
-                var txt = text.Substring(start, length);
+                var txt = text.ToString(start, length);
                 return new Token(NodeKind.WhitespaceToken, start, txt, null);
             }
 
@@ -79,7 +81,7 @@
                     Next();
 
                 var length = position - start;
-                var txt = text.Substring(start, length);
+                var txt = text.ToString(start, length);
 
                 if (txt == "true")
                 {
@@ -155,7 +157,7 @@
 
 
             diagnostics.ReportBadCharacter(position, Current);
-            return new Token(NodeKind.BadToken, position++, text.Substring(position - 1, 1), null);
+            return new Token(NodeKind.BadToken, position++, text.ToString(position - 1, 1), null);
         }
 
         private void Next()

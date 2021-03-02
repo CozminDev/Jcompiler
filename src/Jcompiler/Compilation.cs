@@ -19,7 +19,7 @@ namespace Jcompiler
         {
             Binder binder = new Binder(symbolTable);
 
-            BoundExpression boundExpression = binder.BindExpression(expressionTree.Root);
+            BoundExpression boundExpression = binder.BindExpression(expressionTree.Root.Expression);
 
             Evaluator evaluator = new Evaluator(boundExpression, symbolTable);
 
