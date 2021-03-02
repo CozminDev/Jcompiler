@@ -1,25 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Jcompiler.Text;
 
 namespace Jcompiler.Syntax
 {
     public class ExpressionTree
     {
-        public ExpressionTree(DiagnosticBag diagnostics, Expression root, Token endOfFileToken)
+        public ExpressionTree(SourceText text)
         {
-            Diagnostics = diagnostics;
-            Root = root;
-            EndOfFileToken = endOfFileToken;
+            Parser parser = new Parser(text);
+            Diagnostics = parser.Diagnostics;
+            Root = parser.ParseCompilationUnit();
+            Text = text;
         }
 
         public DiagnosticBag Diagnostics { get; }
-        public Expression Root { get; }
-        public Token EndOfFileToken { get; }
+        public CompilationUnit Root { get; }
+        public SourceText Text { get; }
 
         public static ExpressionTree Parse(string text)
         {
-            var parser = new Parser(text);
-            return parser.Parse();
+            SourceText sourceText = SourceText.From(text);
+            return new ExpressionTree(sourceText);
         }
     }
 }

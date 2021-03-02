@@ -1,7 +1,9 @@
 ﻿using Jcompiler.Syntax;
+using Jcompiler.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Jcompiler
 {
@@ -10,16 +12,29 @@ namespace Jcompiler
         static void Main(string[] args)
         {
             Dictionary<string, object> symbolTable = new Dictionary<string, object>();
+            StringBuilder textBuilder = new StringBuilder();
 
             while (true)
             {
-                Console.Write("> ");
-                string text = Console.ReadLine();
+                if (textBuilder.Length == 0)
+                    Console.Write("> ");
+                else
+                    Console.Write("|");
+
+                string input = Console.ReadLine();
+                bool isBlank = string.IsNullOrWhiteSpace(input);
+                textBuilder.AppendLine(input);
+
+                string text = textBuilder.ToString();
                 ExpressionTree expressionTree = ExpressionTree.Parse(text);
+
+                if (!isBlank && expressionTree.Diagnostics.Any())
+                    continue;
 
                 if (expressionTree.Diagnostics.Any())
                 {
-                    PrintDiagnostics(expressionTree.Diagnostics, text);
+                    PrintDiagnostics(expressionTree.Diagnostics, expressionTree.Text);
+                    textBuilder.Clear();
                     continue;
                 }
 
@@ -28,35 +43,49 @@ namespace Jcompiler
 
                 if (result.Diagnostics.Any())
                 {
-                    PrintDiagnostics(result.Diagnostics, text);
+                    PrintDiagnostics(result.Diagnostics, expressionTree.Text);
                     continue;
                 }
 
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine(result.Result);
-                PrettyPrint(expressionTree.Root);
+                Console.ResetColor();
+                PrettyPrint(expressionTree.Root.Expression);
+                textBuilder.Clear();
             }
         }
 
-        static void PrintDiagnostics(DiagnosticBag diagnostics, string text)
+        static void PrintDiagnostics(DiagnosticBag diagnostics, SourceText text)
         {
-            foreach (Diagnostic error in diagnostics)
+            foreach (Diagnostic diagnostic in diagnostics)
             {
-                string prefix = text.Substring(0, error.Span.Position);
-                string span = text.Substring(error.Span.Position, error.Span.Length);
-                string suffix = text.Substring(error.Span.Position + error.Span.Length);
+                int lineIndex = text.GetLineIndexByPosition(diagnostic.Span.Start);
+                TextLine line = text.Lines[lineIndex];
+
+                int lineNumber = lineIndex + 1;
+                int characterNumber = diagnostic.Span.Start - line.Start + 1;
 
                 Console.WriteLine();
+
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write($"({lineNumber}, {characterNumber}): ");
+                Console.WriteLine(diagnostic);
+                Console.ResetColor();
+
+                string prefix = text.ToString(line.Start, diagnostic.Span.Start);
+                string span = text.ToString(diagnostic.Span.Start, diagnostic.Span.Length);
+                string suffix = text.ToString(diagnostic.Span.End, line.End - diagnostic.Span.End);
+
                 Console.Write("     ");
                 Console.Write(prefix);
+
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.Write(span);
                 Console.ResetColor();
+
                 Console.Write(suffix);
-                Console.ForegroundColor = ConsoleColor.DarkRed;
+
                 Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine(error);
-                Console.ResetColor();
             }
         }
 

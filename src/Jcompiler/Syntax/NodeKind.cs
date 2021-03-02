@@ -31,5 +31,6 @@
         EqualsToken,
         IdentifierExpression,
         AssignmentExpression,
+        CompilationUnit,
     }
 }

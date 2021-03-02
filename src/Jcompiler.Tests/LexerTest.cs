@@ -1,4 +1,5 @@
 using Jcompiler.Syntax;
+using Jcompiler.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,8 @@ namespace Jcompiler.Tests
 
         private static IEnumerable<Token> GetActualTokens(string text, DiagnosticBag diagnostics)
         {
-            Lexer lexer = new Lexer(text, diagnostics);
+            SourceText sourceText = SourceText.From(text);
+            Lexer lexer = new Lexer(sourceText, diagnostics);
 
             while (true)
             {

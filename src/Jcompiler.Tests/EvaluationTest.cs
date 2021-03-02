@@ -11,8 +11,7 @@ namespace Jcompiler.Tests
         public void Evaluate_PlusExpression_ReturnsCorrectResult()
         {
             string text = "1+2";
-            Parser parser = new Parser(text);
-            ExpressionTree tree = parser.Parse();
+            ExpressionTree tree = ExpressionTree.Parse(text);
             Dictionary<string, object> symbolTable = new Dictionary<string, object>();
             Compilation compilation = new Compilation(tree, symbolTable);
 
@@ -25,8 +24,7 @@ namespace Jcompiler.Tests
         public void Evaluate_PlusAndTimesExpression_ReturnsCorrectResult()
         {
             string text = "1+2*5";
-            Parser parser = new Parser(text);
-            ExpressionTree tree = parser.Parse();
+            ExpressionTree tree = ExpressionTree.Parse(text);
             Dictionary<string, object> symbolTable = new Dictionary<string, object>();
             Compilation compilation = new Compilation(tree, symbolTable);
 
@@ -39,8 +37,7 @@ namespace Jcompiler.Tests
         public void Evaluate_ParenthesizedExpression_ReturnsCorrectResult()
         {
             string text = "(1+2)*5";
-            Parser parser = new Parser(text);
-            ExpressionTree tree = parser.Parse();
+            ExpressionTree tree = ExpressionTree.Parse(text);
             Dictionary<string, object> symbolTable = new Dictionary<string, object>();
             Compilation compilation = new Compilation(tree, symbolTable);
 
@@ -53,8 +50,7 @@ namespace Jcompiler.Tests
         public void Evaluate_AssignmentExpression_ReturnsCorrectResult()
         {
             string text = "a = 1";
-            Parser parser = new Parser(text);
-            ExpressionTree tree = parser.Parse();
+            ExpressionTree tree = ExpressionTree.Parse(text);
             Dictionary<string, object> symbolTable = new Dictionary<string, object>();
             Compilation compilation = new Compilation(tree, symbolTable);
 
@@ -63,8 +59,7 @@ namespace Jcompiler.Tests
             Assert.AreEqual(1, result.Result);
 
             text = "a";
-            parser = new Parser(text);
-            tree = parser.Parse();
+            tree = ExpressionTree.Parse(text);
             compilation = new Compilation(tree, symbolTable);
             result = compilation.Evaluate();
 
