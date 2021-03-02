@@ -32,10 +32,10 @@ namespace Jcompiler.Tests
         [TestMethod]
         public void NextToken_TokenDoesNotExist_BadTokenReturned()
         {
-            Token[] actualTokens = GetActualTokens("|", diagnostics).ToArray();
+            Token[] actualTokens = GetActualTokens("@", diagnostics).ToArray();
             Assert.AreEqual(1, actualTokens.Length);
             Assert.AreEqual(NodeKind.BadToken, actualTokens[0].Kind);
-            Assert.AreEqual("|", actualTokens[0].Text);
+            Assert.AreEqual("@", actualTokens[0].Text);
         }
 
         private static IEnumerable<Token> GetActualTokens(string text, DiagnosticBag diagnostics)

@@ -72,7 +72,7 @@ namespace Jcompiler
                 Console.WriteLine(diagnostic);
                 Console.ResetColor();
 
-                string prefix = text.ToString(line.Start, diagnostic.Span.Start);
+                string prefix = text.ToString(line.Start, diagnostic.Span.Start - line.Start);
                 string span = text.ToString(diagnostic.Span.Start, diagnostic.Span.Length);
                 string suffix = text.ToString(diagnostic.Span.End, line.End - diagnostic.Span.End);
 

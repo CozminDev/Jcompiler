@@ -2,7 +2,6 @@
 {
     public static class Facts
     {
-
         public static int GetUnaryOperatorPrecedence(this NodeKind kind)
         {
             switch (kind)
@@ -54,6 +53,43 @@
                     return NodeKind.FalseKeyword;
                 default:
                     return NodeKind.IdentifierToken;
+            }
+        }
+
+        public static string GetText(NodeKind kind)
+        {
+            switch (kind)
+            {
+                case NodeKind.PlusToken:
+                    return "+";
+                case NodeKind.MinusToken:
+                    return "-";
+                case NodeKind.StarToken:
+                    return "*";
+                case NodeKind.SlashToken:
+                    return "/";
+                case NodeKind.BangToken:
+                    return "!";
+                case NodeKind.EqualsToken:
+                    return "=";
+                case NodeKind.AmpersandAmpersandToken:
+                    return "&&";
+                case NodeKind.PipePipeToken:
+                    return "||";
+                case NodeKind.EqualsEqualsToken:
+                    return "==";
+                case NodeKind.BangEqualsToken:
+                    return "!=";
+                case NodeKind.OpenParenthesisToken:
+                    return "(";
+                case NodeKind.CloseParenthesisToken:
+                    return ")";
+                case NodeKind.FalseKeyword:
+                    return "false";
+                case NodeKind.TrueKeyword:
+                    return "true";
+                default:
+                    return null;
             }
         }
     }
