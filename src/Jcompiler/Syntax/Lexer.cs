@@ -6,7 +6,11 @@ namespace Jcompiler.Syntax
     {
         private readonly SourceText text;
         private DiagnosticBag diagnostics;
+
         private int position;
+        private int start;
+        private NodeKind kind;
+        private object value;
 
         public char Current
         {
@@ -38,131 +42,150 @@ namespace Jcompiler.Syntax
 
         public Token NextToken()
         {
-            if (text.Length == 0)
-                diagnostics.ReportNoInput();
-
-            if (position >= text.Length)
-                return new Token(NodeKind.EndOfFileToken, position, "\0", null);
-
-            if (char.IsDigit(Current))
-            {
-                int start = position;
-                while (char.IsDigit(Current))
-                {
-                    Next();
-                }
-
-                int length = position - start;
-                string txt = text.ToString(start, length);
-                if (!int.TryParse(txt, out int value))
-                    diagnostics.ReportInvalidNumber(new TextSpan(start, length), txt, typeof(int));
-
-                return new Token(NodeKind.NumberToken, start, txt, value);
-            }
-
-
-            if (char.IsWhiteSpace(Current))
-            {
-                var start = position;
-
-                while (char.IsWhiteSpace(Current))
-                    Next();
-
-                var length = position - start;
-                var txt = text.ToString(start, length);
-                return new Token(NodeKind.WhitespaceToken, start, txt, null);
-            }
-
-            if (char.IsLetter(Current))
-            {
-                var start = position;
-
-                while (char.IsLetter(Current))
-                    Next();
-
-                var length = position - start;
-                var txt = text.ToString(start, length);
-
-                if (txt == "true")
-                {
-                    return new Token(NodeKind.TrueKeyword, start, txt, null);
-                }
-                else if (txt == "false")
-                {
-                    return new Token(NodeKind.FalseKeyword, start, txt, null);
-                }
-                else
-                {
-                    return new Token(NodeKind.IdentifierToken, start, txt, null);
-                }
-            }
+            start = position;
+            kind = NodeKind.BadToken;
+            value = null;
 
             switch (Current)
             {
+                case '\0':
+                    kind = NodeKind.EndOfFileToken;
+                    break;
                 case '+':
-                    return new Token(NodeKind.PlusToken, position++, "+", null);
+                    kind = NodeKind.PlusToken;
+                    position++;
+                    break;
                 case '-':
-                    return new Token(NodeKind.MinusToken, position++, "-", null);
+                    kind = NodeKind.MinusToken;
+                    position++;
+                    break;
                 case '*':
-                    return new Token(NodeKind.StarToken, position++, "*", null);
+                    kind = NodeKind.StarToken;
+                    position++;
+                    break;
                 case '/':
-                    return new Token(NodeKind.SlashToken, position++, "/", null);
+                    kind = NodeKind.SlashToken;
+                    position++;
+                    break;
                 case '(':
-                    return new Token(NodeKind.OpenParenthesisToken, position++, "(", null);
+                    kind = NodeKind.OpenParenthesisToken;
+                    position++;
+                    break;
                 case ')':
-                    return new Token(NodeKind.CloseParenthesisToken, position++, ")", null);
-                case '!':
-                    {
-                        if (Lookahead == '=')
-                        {
-                            int start = position;
-                            position += 2;
-                            return new Token(NodeKind.BangEqualsToken, start, "!=", null);
-                        }
-                        else
-                            return new Token(NodeKind.BangToken, position++, "!", null);
-                    }
-                case '=':
-                    {
-                        if (Lookahead == '=')
-                        {
-                            int start = position;
-                            position += 2;
-                            return new Token(NodeKind.EqualsEqualsToken, start, "==", null);
-                        }
-                        else
-                            return new Token(NodeKind.EqualsToken, position++, "=", null);
-                    }
-                case '|':
-                    {
-                        if (Lookahead == '|')
-                        {
-                            int start = position;
-                            position += 2;
-                            return new Token(NodeKind.PipePipeToken, start, "||", null);
-                        }
-                        break;
-                    }
+                    kind = NodeKind.CloseParenthesisToken;
+                    position++;
+                    break;
                 case '&':
+                    if (Lookahead == '&')
                     {
-                        if (Lookahead == '&')
-                        {
-                            int start = position;
-                            position += 2;
-                            return new Token(NodeKind.AmpersandAmpersandToken, start, "&&", null);
-                        }
-                        break;
+                        kind = NodeKind.AmpersandAmpersandToken;
+                        position += 2;
                     }
+                    break;
+                case '|':
+                    if (Lookahead == '|')
+                    {
+                        kind = NodeKind.PipePipeToken;
+                        position += 2;
+                    }
+                    break;
+                case '=':
+                    position++;
+                    if (Current != '=')
+                    {
+                        kind = NodeKind.EqualsToken;
+                    }
+                    else
+                    {
+                        kind = NodeKind.EqualsEqualsToken;
+                        position++;
+                    }
+                    break;
+                case '!':
+                    position++;
+                    if (Current != '=')
+                    {
+                        kind = NodeKind.BangToken;
+                    }
+                    else
+                    {
+                        kind = NodeKind.BangEqualsToken;
+                        position++;
+                    }
+                    break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    ReadNumber();
+                    break;
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
+                    ReadWhiteSpace();
+                    break;
+                default:
+                    if (char.IsLetter(Current))
+                    {
+                        ReadIdentifierOrKeyword();
+                    }
+                    else if (char.IsWhiteSpace(Current))
+                    {
+                        ReadWhiteSpace();
+                    }
+                    else
+                    {
+                        diagnostics.ReportBadCharacter(position, Current);
+                        position++;
+                    }
+                    break;
             }
 
+            int length = position - start;
+            string txt = Facts.GetText(kind);
+            if (txt == null)
+                txt = text.ToString(start, length);
 
-            diagnostics.ReportBadCharacter(position, Current);
-            return new Token(NodeKind.BadToken, position++, text.ToString(position - 1, 1), null);
+            return new Token(kind, start, txt, value);
         }
 
-        private void Next()
+        private void ReadWhiteSpace()
         {
-            position++;
+            while (char.IsWhiteSpace(Current))
+                position++;
+
+            kind = NodeKind.WhitespaceToken;
+        }
+
+        private void ReadNumber()
+        {
+            while (char.IsDigit(Current))
+                position++;
+
+            int length = position - start;
+            string txt = text.ToString(start, length);
+            if (!int.TryParse(txt, out int val))
+                diagnostics.ReportInvalidNumber(new TextSpan(start, length), txt, typeof(int));
+
+            value = val;
+            kind = NodeKind.NumberToken;
+        }
+
+        private void ReadIdentifierOrKeyword()
+        {
+            while (char.IsLetter(Current))
+                position++;
+
+            int length = position - start;
+            string txt = text.ToString(start, length);
+            kind = Facts.GetKeywordKind(txt);
         }
     }
 }
